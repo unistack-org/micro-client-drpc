@@ -2,9 +2,11 @@
 package drpc
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -18,13 +20,11 @@ import (
 	dmetadata "storj.io/drpc/drpcmetadata"
 )
 
-var (
-	DefaultContentType = "application/drpc+proto"
-)
+var DefaultContentType = "application/drpc+proto"
 
 type drpcClient struct {
 	opts client.Options
-	//pool *pool
+	// pool *pool
 	init bool
 	sync.RWMutex
 }
@@ -52,8 +52,8 @@ func (d *drpcClient) call(ctx context.Context, addr string, req client.Request, 
 		return errors.InternalServerError("go.micro.client", err.Error())
 	}
 
-	//maxRecvMsgSize := d.maxRecvMsgSizeValue()
-	//maxSendMsgSize := d.maxSendMsgSizeValue()
+	// maxRecvMsgSize := d.maxRecvMsgSizeValue()
+	// maxSendMsgSize := d.maxSendMsgSizeValue()
 
 	var grr error
 
@@ -91,7 +91,7 @@ func (d *drpcClient) call(ctx context.Context, addr string, req client.Request, 
 	*/
 	ch := make(chan error, 1)
 	_ = dialCtx
-	//rc, err := net.DialContext(ctx, "tcp", addr)
+	// rc, err := net.DialContext(ctx, "tcp", addr)
 	rc, err := net.Dial("tcp", addr)
 	if err != nil {
 		return err
@@ -606,47 +606,64 @@ func (g *drpcClient) Stream(ctx context.Context, req client.Request, opts ...cli
 	*/
 }
 
-func (c *drpcClient) Publish(ctx context.Context, p client.Message, opts ...client.PublishOption) error {
-	var body []byte
+func (c *drpcClient) BatchPublish(ctx context.Context, msgs []client.Message, opts ...client.PublishOption) error {
+	return c.publish(ctx, msgs, opts...)
+}
 
+func (c *drpcClient) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
+	return c.publish(ctx, []client.Message{msg}, opts...)
+}
+
+func (c *drpcClient) publish(ctx context.Context, ps []client.Message, opts ...client.PublishOption) error {
 	options := client.NewPublishOptions(opts...)
 
-	md, ok := metadata.FromOutgoingContext(ctx)
-	if !ok {
-		md = metadata.New(2)
+	// get proxy
+	exchange := ""
+	if v, ok := os.LookupEnv("MICRO_PROXY"); ok {
+		exchange = v
 	}
-	md[metadata.HeaderContentType] = p.ContentType()
-	md[metadata.HeaderTopic] = p.Topic()
 
-	// passed in raw data
-	if d, ok := p.Payload().(*codec.Frame); ok {
-		body = d.Data
-	} else {
-		// use codec for payload
+	omd, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		omd = metadata.New(2)
+	}
+
+	msgs := make([]*broker.Message, 0, len(ps))
+
+	for _, p := range ps {
+		md := metadata.Copy(omd)
+		md[metadata.HeaderContentType] = p.ContentType()
+		md[metadata.HeaderTopic] = p.Topic()
+
 		cf, err := c.newCodec(p.ContentType())
 		if err != nil {
 			return errors.InternalServerError("go.micro.client", err.Error())
 		}
-		// set the body
-		b, err := cf.Marshal(p.Payload())
-		if err != nil {
-			return errors.InternalServerError("go.micro.client", err.Error())
+
+		var body []byte
+
+		// passed in raw data
+		if d, ok := p.Payload().(*codec.Frame); ok {
+			body = d.Data
+		} else {
+			b := bytes.NewBuffer(nil)
+			if err := cf.Write(b, &codec.Message{Type: codec.Event}, p.Payload()); err != nil {
+				return errors.InternalServerError("go.micro.client", err.Error())
+			}
+			body = b.Bytes()
 		}
-		body = b
+
+		topic := p.Topic()
+		if len(exchange) > 0 {
+			topic = exchange
+		}
+
+		md.Set(metadata.HeaderTopic, topic)
+		msgs = append(msgs, &broker.Message{Header: md, Body: body})
 	}
 
-	topic := p.Topic()
-
-	// get the exchange
-	if len(options.Exchange) > 0 {
-		topic = options.Exchange
-	}
-
-	return c.opts.Broker.Publish(metadata.NewOutgoingContext(ctx, md), topic, &broker.Message{
-		Header: md,
-		Body:   body,
-	},
-		broker.PublishContext(options.Context),
+	return c.opts.Broker.BatchPublish(ctx, msgs,
+		broker.PublishContext(ctx),
 		broker.PublishBodyOnly(options.BodyOnly),
 	)
 }

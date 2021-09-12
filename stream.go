@@ -1,3 +1,5 @@
+//go:build ignore
+
 package drpc
 
 import (
@@ -6,18 +8,17 @@ import (
 	"sync"
 
 	"github.com/unistack-org/micro/v3/client"
-	"google.golang.org/grpc"
 )
 
 // Implements the streamer interface
 type drpcStream struct {
-	grpc.ClientStream
+	// grpc.ClientStream
 	context  context.Context
 	err      error
 	request  client.Request
 	response client.Response
 	close    func(err error)
-	//conn     *poolConn
+	// conn     *poolConn
 	sync.RWMutex
 	closed bool
 }
