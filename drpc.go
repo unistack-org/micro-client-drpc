@@ -1,5 +1,5 @@
 // Package drpc provides a drpc client
-package drpc
+package drpc // import "go.unistack.org/micro-client-drpc/v3"
 
 import (
 	"bytes"

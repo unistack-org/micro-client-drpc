@@ -1,7 +1,7 @@
 package drpc
 
 import (
-	"github.com/unistack-org/micro/v3/errors"
+	"go.unistack.org/micro/v3/errors"
 )
 
 func microError(err error) error {

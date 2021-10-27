@@ -1,7 +1,7 @@
 package drpc
 
 import (
-	"github.com/unistack-org/micro/v3/client"
+	"go.unistack.org/micro/v3/client"
 )
 
 type drpcEvent struct {

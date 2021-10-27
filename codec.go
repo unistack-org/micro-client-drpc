@@ -1,7 +1,7 @@
 package drpc
 
 import (
-	"github.com/unistack-org/micro/v3/codec"
+	"go.unistack.org/micro/v3/codec"
 	"storj.io/drpc"
 )
 
