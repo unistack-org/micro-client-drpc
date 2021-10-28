@@ -1,3 +1,4 @@
+// +build ignore
 //go:build ignore
 
 package drpc
