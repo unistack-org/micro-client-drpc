@@ -17,7 +17,7 @@ func microError(err error) error {
 
 	// fallback
 	return &errors.Error{
-		Id:     "go.micro.client",
+		ID:     "go.micro.client",
 		Code:   500,
 		Detail: err.Error(),
 		// Status: http.StatusInternalServerError,
