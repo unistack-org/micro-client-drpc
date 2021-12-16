@@ -2,19 +2,18 @@ package drpc
 
 import (
 	"go.unistack.org/micro/v3/client"
+	"go.unistack.org/micro/v3/metadata"
 )
 
 type drpcEvent struct {
 	payload     interface{}
 	topic       string
 	contentType string
+	opts        client.MessageOptions
 }
 
 func newDRPCEvent(topic string, payload interface{}, contentType string, opts ...client.MessageOption) client.Message {
-	var options client.MessageOptions
-	for _, o := range opts {
-		o(&options)
-	}
+	options := client.NewMessageOptions(opts...)
 
 	if len(options.ContentType) > 0 {
 		contentType = options.ContentType
@@ -23,6 +22,7 @@ func newDRPCEvent(topic string, payload interface{}, contentType string, opts ..
 	return &drpcEvent{
 		payload:     payload,
 		topic:       topic,
+		opts:        options,
 		contentType: contentType,
 	}
 }
@@ -37,4 +37,8 @@ func (d *drpcEvent) Topic() string {
 
 func (d *drpcEvent) Payload() interface{} {
 	return d.payload
+}
+
+func (d *drpcEvent) Metadata() metadata.Metadata {
+	return d.opts.Metadata
 }
