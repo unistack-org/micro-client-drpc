@@ -4,5 +4,5 @@ go 1.16
 
 require (
 	go.unistack.org/micro/v3 v3.8.21
-	storj.io/drpc v0.0.29
+	storj.io/drpc v0.0.30
 )
