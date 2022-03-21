@@ -18,24 +18,16 @@ type drpcRequest struct {
 }
 
 // service Struct.Method /service.Struct/Method
-func methodToDRPC(service, method string) string {
-	// no method or already grpc method
+func methodToDRPC(_ string, method string) string {
+	// no method or already drpc method
 	if len(method) == 0 || method[0] == '/' {
 		return method
 	}
 
-	// assume method is Foo.Bar
-	mParts := strings.Split(method, ".")
-	if len(mParts) != 2 {
-		return method
-	}
-
-	if len(service) == 0 {
-		return fmt.Sprintf("/%s/%s", mParts[0], mParts[1])
-	}
-
-	// return /pkg.Foo/Bar
-	return fmt.Sprintf("/%s.%s/%s", strings.Title(service), mParts[0], mParts[1])
+	idx := strings.LastIndex(method, ".")
+	drpcService := method[:idx]
+	drpcMethod := method[idx+1:]
+	return fmt.Sprintf("/%s/%s", drpcService, drpcMethod)
 }
 
 func newDRPCRequest(service, method string, request interface{}, contentType string, reqOpts ...client.RequestOption) client.Request {
