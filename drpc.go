@@ -30,6 +30,9 @@ type drpcClient struct {
 
 func (d *drpcClient) call(ctx context.Context, addr string, req client.Request, rsp interface{}, opts client.CallOptions) error {
 	var header map[string]string
+	if strings.HasPrefix(addr, "http") {
+		addr = addr[strings.Index(addr, ":")+3:]
+	}
 
 	if md, ok := metadata.FromOutgoingContext(ctx); ok {
 		header = make(map[string]string, len(md))
@@ -90,6 +93,7 @@ func (d *drpcClient) call(ctx context.Context, addr string, req client.Request, 
 	*/
 	ch := make(chan error, 1)
 	_ = dialCtx
+
 	// rc, err := net.DialContext(ctx, "tcp", addr)
 	rc, err := net.Dial("tcp", addr)
 	if err != nil {

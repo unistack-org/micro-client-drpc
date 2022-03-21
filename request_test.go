@@ -12,7 +12,7 @@ func TestMethodToDRPC(t *testing.T) {
 	}{
 		{
 			"helloworld",
-			"Greeter.SayHello",
+			"Greeter/SayHello",
 			"/Helloworld.Greeter/SayHello",
 		},
 		{
