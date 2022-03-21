@@ -18,13 +18,16 @@ type drpcRequest struct {
 }
 
 // service Struct.Method /service.Struct/Method
-func methodToDRPC(_ string, method string) string {
+func methodToDRPC(service string, method string) string {
 	// no method or already drpc method
 	if len(method) == 0 || method[0] == '/' {
 		return method
 	}
 
 	idx := strings.LastIndex(method, ".")
+	if len(method) < 3 || idx < 2 {
+		return fmt.Sprintf("/%s.%s", strings.Title(service), method)
+	}
 	drpcService := method[:idx]
 	drpcMethod := method[idx+1:]
 	return fmt.Sprintf("/%s/%s", drpcService, drpcMethod)
