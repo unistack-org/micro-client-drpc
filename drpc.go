@@ -15,6 +15,7 @@ import (
 	"go.unistack.org/micro/v3/codec"
 	"go.unistack.org/micro/v3/errors"
 	"go.unistack.org/micro/v3/metadata"
+	"go.unistack.org/micro/v3/selector"
 	"storj.io/drpc/drpcconn"
 	dmetadata "storj.io/drpc/drpcmetadata"
 )
@@ -401,18 +402,7 @@ func (d *drpcClient) Call(ctx context.Context, req client.Request, rsp interface
 		callOpts.Address = []string{d.opts.Proxy}
 	}
 
-	// lookup the route to send the reques to
-	// TODO apply any filtering here
-	routes, err := d.opts.Lookup(ctx, req, callOpts)
-	if err != nil {
-		return errors.InternalServerError("go.micro.client", err.Error())
-	}
-
-	// balance the list of nodes
-	next, err := callOpts.Selector.Select(routes)
-	if err != nil {
-		return err
-	}
+	var next selector.Next
 
 	// return errors.New("go.micro.client", "request timeout", 408)
 	call := func(i int) error {
@@ -425,6 +415,23 @@ func (d *drpcClient) Call(ctx context.Context, req client.Request, rsp interface
 		// only sleep if greater than 0
 		if t.Seconds() > 0 {
 			time.Sleep(t)
+		}
+
+		if next == nil {
+			var routes []string
+
+			// lookup the route to send the reques to
+			// TODO apply any filtering here
+			routes, err = d.opts.Lookup(ctx, req, callOpts)
+			if err != nil {
+				return errors.InternalServerError("go.micro.client", err.Error())
+			}
+
+			// balance the list of nodes
+			next, err = callOpts.Selector.Select(routes)
+			if err != nil {
+				return err
+			}
 		}
 
 		// get the next node
@@ -520,18 +527,7 @@ func (g *drpcClient) Stream(ctx context.Context, req client.Request, opts ...cli
 			callOpts.Address = []string{g.opts.Proxy}
 		}
 
-		// lookup the route to send the reques to
-		// TODO: move to internal lookup func
-		routes, err := g.opts.Lookup(ctx, req, callOpts)
-		if err != nil {
-			return nil, errors.InternalServerError("go.micro.client", err.Error())
-		}
-
-		// balance the list of nodes
-		next, err := callOpts.Selector.Select(routes)
-		if err != nil {
-			return nil, err
-		}
+		var next selector.Next
 
 		call := func(i int) (client.Stream, error) {
 			// call backoff first. Someone may want an initial start delay
@@ -544,6 +540,23 @@ func (g *drpcClient) Stream(ctx context.Context, req client.Request, opts ...cli
 			if t.Seconds() > 0 {
 				time.Sleep(t)
 			}
+
+			if next == nil {
+			var routes []string
+
+			// lookup the route to send the reques to
+			// TODO apply any filtering here
+			routes, err = d.opts.Lookup(ctx, req, callOpts)
+			if err != nil {
+				return nil, errors.InternalServerError("go.micro.client", err.Error())
+			}
+
+			// balance the list of nodes
+			next, err := callOpts.Selector.Select(routes)
+			if err != nil {
+				return nil, err
+			}
+		}
 
 			// get the next node
 			node := next()
