@@ -8,8 +8,8 @@ github.com/zeebo/assert v1.3.0/go.mod h1:Pq9JiuJQpG8JLJdtkwrJESF0Foym2/D9XMU5ciN
 github.com/zeebo/errs v1.2.2/go.mod h1:sgbWHsvVuTPHcqJJGQ1WhI5KbWlHYz+2+2C/LSEtCw4=
 github.com/zeebo/errs v1.3.0 h1:hmiaKqgYZzcVgRL1Vkc1Mn2914BbzB0IBxs+ebeutGs=
 github.com/zeebo/errs v1.3.0/go.mod h1:sgbWHsvVuTPHcqJJGQ1WhI5KbWlHYz+2+2C/LSEtCw4=
-go.unistack.org/micro/v3 v3.10.22 h1:04QQTo+sxK5pttZfqPbhiuZkZMrdJTfiALoqamci6IQ=
-go.unistack.org/micro/v3 v3.10.22/go.mod h1:XIArw29f0b3uvF4cq96X/nQt2f0J2OGnjh8J+DBbC0s=
+go.unistack.org/micro/v3 v3.10.23 h1:4BE7NwwyJbCWOfzjzztamBxJSgRHHW1uQtMGNDLHG3s=
+go.unistack.org/micro/v3 v3.10.23/go.mod h1:XIArw29f0b3uvF4cq96X/nQt2f0J2OGnjh8J+DBbC0s=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 google.golang.org/protobuf v1.26.0-rc.1/go.mod h1:jlhhOSvTdKEhbULTjvd4ARK9grFBp09yW+WbY/TyQbw=
 google.golang.org/protobuf v1.27.1/go.mod h1:9q0QmTI4eRPtz6boOQmLYwt+qCgq0jsYwAQnmE0givc=
