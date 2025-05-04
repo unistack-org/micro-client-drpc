@@ -3,7 +3,7 @@ package drpc
 import (
 	"context"
 
-	"go.unistack.org/micro/v3/client"
+	"go.unistack.org/micro/v4/client"
 )
 
 var (
