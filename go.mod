@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	go.unistack.org/micro/v3 v3.11.51
-	storj.io/drpc v0.0.32
+	storj.io/drpc v0.0.34
 )
 
 require (
