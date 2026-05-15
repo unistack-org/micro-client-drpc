@@ -8,7 +8,7 @@ import (
 	"io"
 	"sync"
 
-	"go.unistack.org/micro/v4/client"
+	"go.unistack.org/micro/v5/client"
 )
 
 // Implements the streamer interface
