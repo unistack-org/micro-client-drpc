@@ -17,7 +17,7 @@ jobs:
       with:
         filter: 'blob:none'
     - name: setup go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
         cache-dependency-path: "**/*.sum"
         go-version: 'stable'
