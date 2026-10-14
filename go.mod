@@ -1,8 +1,7 @@
 module go.unistack.org/micro-client-drpc/v5
 
-go 1.23.0
+go 1.27
 
-toolchain go1.24.2
 
 require (
 	go.unistack.org/micro/v3 v3.11.43
